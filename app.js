@@ -8,16 +8,35 @@ const pool = mysql.createPool({
   host: "localhost",
   user: "sbsst",
   password: "sbs123414",
-  database: "a5",
+  database: "a9",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
 app.get("/", async (req, res) => {
-  const [rows] = await pool.query("SELECT * FROM market ORDER BY id DESC");
+  const [rows] = await pool.query("SELECT * FROM todo ORDER BY id DESC");
   console.log(rows);
   res.json(rows);
+});
+
+app.get("/todos/:id", async (req, res) => {
+  const { id } = req.params;
+  const [rows] = await pool.query(
+    `
+    SELECT *
+    FROM todo
+    WHERE id = ?
+    `,
+    [id]
+  );
+  if (rows.length === 0) {
+    res.status(404).json({
+      msg: "not found",
+    });
+    return;
+  }
+  res.json(rows[0]);
 });
 
 app.listen(port, () => {
